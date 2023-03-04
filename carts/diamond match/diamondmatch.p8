@@ -2,6 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 -- INIT FUNCION --
+--test
 function _init()
     --set location of grid and tile size
     grid_loc_x = 5
