@@ -34,7 +34,7 @@ function _draw()
     cls ()
     draw_grid(grid_loc_x, grid_loc_y, tile_size)
     draw_diamonds(grid_loc_x, grid_loc_y, tile_size)
-    draw_cursor(grid_loc_x, grid_loc_y, tile_size, curx1, cury1, curx2, cury2, 10)
+    draw_cursor(grid_loc_x, grid_loc_y, tile_size, curx1, cury1, curx2, cury2, 5)
     check_matches()
     --print_values()
 end
@@ -83,11 +83,18 @@ function draw_cursor(startx,starty,tile,x1,y1,x2,y2,color)
     -- x2,y2 - second cell selected
     -- color - color of the lines
 
+    --set offset for bottom y line
+    local k = 1
+    if rot == true then
+        k = 2
+        print ("k")
+    end
+
     -- draw top and bottom line --
     local toplinex = startx + (x1-1)*tile + (x1-1)
-    local toplinex2 = startx + (x2)*tile + (x2-1) + 1 
+    local toplinex2 = startx + (x2)*tile + (x2-1) + 1
     local topliney = starty + (y1-1)*tile + (y1-1)
-    local bottomliney = topliney + (y2-y1+1)*tile + 1
+    local bottomliney = topliney + (y2-y1+1)*tile + k
     line (toplinex,topliney,toplinex2,topliney,color)
     line (toplinex,bottomliney,toplinex2,bottomliney,color)
 
@@ -157,37 +164,121 @@ function listen_button_input()
     end
     -- Swap tiles button
     if btnp(5) then
-        local temp = gemlocations[cury1][curx1]
-        gemlocations[cury1][curx1] = gemlocations[cury2][curx2]
-        gemlocations[cury2][curx2] = temp
+        if match() then
+            local temp = gemlocations[cury1][curx1]
+            gemlocations[cury1][curx1] = gemlocations[cury2][curx2]
+            gemlocations[cury2][curx2] = temp
+        end
     end
+end
+
+function match()
+    return true
 end
 
 function check_matches()
     local a = 0
     local b = 0
     local c = 0
+    local d = 0
+    local e = 0
+    local f = 0
+    local match = ""
 
     for j = 1,6 do -- check horizontal matches
-        for i = 1,4 do
-            a = gemlocations[j][i]
-            b = gemlocations[j][i+1]
-            c = gemlocations[j][i+2]
-            if a == b and b == c then
-                local match = "match in row" .. j
-                print (match)
-            end
+        a = gemlocations [j][1]
+        b = gemlocations [j][2]
+        c = gemlocations [j][3]
+        d = gemlocations [j][4]
+        e = gemlocations [j][5]
+        f = gemlocations [j][6]
+
+        -- checks the different types of matches. Sets gemlocations to 9 (blank)
+        if a == b and b == c and c == d and d == e and e == f then
+            gemlocations [j][1], gemlocations [j][2], gemlocations [j][3], gemlocations [j][4],  gemlocations [j][5],  gemlocations [j][6] = 9,9,9,9,9,9
+            reseed()
+        elseif a == b and b == c and c == d and d == e then
+            gemlocations [j][1], gemlocations [j][2], gemlocations [j][3], gemlocations [j][4],  gemlocations [j][5] = 9,9,9,9,9
+            reseed()
+        elseif b == c and c == d and d == e and e == f then
+            gemlocations [j][2], gemlocations [j][3], gemlocations [j][4], gemlocations [j][5],  gemlocations [j][6] = 9,9,9,9,9
+            reseed()
+        elseif a == b and b == c and c == d then
+            gemlocations [j][1], gemlocations [j][2], gemlocations [j][3], gemlocations [j][4] = 9,9,9,9
+            reseed()
+        elseif b == c and c == d and d == e then
+            gemlocations [j][2], gemlocations [j][3], gemlocations [j][4], gemlocations [j][5] = 9,9,9,9
+            reseed()
+        elseif c == d and d == e and e == f then
+            gemlocations [j][3], gemlocations [j][4], gemlocations [j][5], gemlocations [j][6] = 9,9,9,9
+            reseed()
+        elseif a == b and b == c then
+            gemlocations [j][1], gemlocations [j][2], gemlocations [j][3] = 9,9,9
+            reseed()
+        elseif b == c and c == d then
+            gemlocations [j][2], gemlocations [j][3], gemlocations [j][4] = 9,9,9
+            reseed()
+        elseif c == d and d == e then
+            gemlocations [j][3], gemlocations [j][4], gemlocations [j][5] = 9,9,9
+            reseed()
+        elseif d == e and e == f then
+            gemlocations [j][4], gemlocations [j][5], gemlocations [j][6] = 9,9,9
+            reseed()
         end
+
     end
 
     for j = 1,6 do -- check vertical matches
-        for i = 1,4 do
-            a = gemlocations[i][j]
-            b = gemlocations[i+1][j]
-            c = gemlocations[i+2][j]
-            if a == b and b == c then
-                local match = "match in column" .. j
-                print (match)
+        a = gemlocations [1][j]
+        b = gemlocations [2][j]
+        c = gemlocations [3][j]
+        d = gemlocations [4][j]
+        e = gemlocations [5][j]
+        f = gemlocations [6][j]
+
+        if a == b and b == c and c == d and d == e and e == f then
+            gemlocations [1][j], gemlocations [2][j], gemlocations [3][j], gemlocations [4][j],  gemlocations [5][j],  gemlocations [6][j] = 9,9,9,9,9,9
+            reseed()
+        elseif a == b and b == c and c == d and d == e then
+            gemlocations [1][j], gemlocations [2][j], gemlocations [3][j], gemlocations [4][j],  gemlocations [5][j] = 9,9,9,9,9
+            reseed()
+        elseif b == c and c == d and d == e and e == f then
+            gemlocations [2][j], gemlocations [3][j], gemlocations [4][j],  gemlocations [5][j],  gemlocations [6][j] = 9,9,9,9,9
+        elseif a == b and b == c and c == d then
+            gemlocations [1][j], gemlocations [2][j], gemlocations [3][j], gemlocations [4][j] = 9,9,9,9
+            reseed()
+        elseif b == c and c == d and d == e then
+            gemlocations [2][j], gemlocations [3][j], gemlocations [4][j],  gemlocations [5][j] = 9,9,9,9
+            reseed()
+        elseif c == d and d == e and e == f then
+            gemlocations [3][j], gemlocations [4][j],  gemlocations [5][j],  gemlocations [6][j] = 9,9,9,9
+            reseed()
+        elseif a == b and b == c then
+             gemlocations [1][j], gemlocations [2][j], gemlocations [3][j] = 9,9,9
+             reseed()
+        elseif b == c and c == d then
+            gemlocations [2][j], gemlocations [3][j], gemlocations [4][j] = 9,9,9
+            reseed()
+        elseif c == d and d == e then
+            gemlocations [3][j], gemlocations [4][j],  gemlocations [5][j] = 9,9,9
+            reseed()
+        elseif d == e and e == f then
+            gemlocations [4][j],  gemlocations [5][j],  gemlocations [6][j] = 9,9,9
+            reseed()
+        end
+    end
+
+end
+
+function reseed()
+    for j = 1,6 do
+        for i = 1,6 do
+            if gemlocations [j][i] == 9 and j-1 ~= 0 then
+                gemlocations [j][i] = gemlocations[j-1][i]
+                gemlocations [j-1][i] = 9
+                reseed()
+            elseif gemlocations [j][i] == 9 then
+                gemlocations [j][i] = flr(rnd(5)) + 1
             end
         end
     end
